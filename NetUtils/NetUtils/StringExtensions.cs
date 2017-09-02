@@ -4,12 +4,127 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace NetUtils
 {
+    public static class CharExtensions
+    {
+        public static bool IsLatinLetter(this char c)
+        {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        }
+    }
+
+    public static class UrlHelpers
+    {
+        const string StrHttp = "http://";
+        const string StrHttps = "https://";
+        const string StrWww = "www.";
+
+        public static string Combine(string parentUrlString, string subpath)
+        {
+            return parentUrlString?.TrimEnd('\\') + '\\' + subpath?.Trim('\\');
+        }
+
+        public static string GetDomainNameFromUrl(string url)
+        {
+            var urlWithoutHttps =
+                !string.IsNullOrEmpty(url) ?
+                    url
+                        .Replace(StrHttp, string.Empty)
+                        .Replace(StrHttps, string.Empty)
+                        .Split('/').ElementAt(0) : null;
+            if (urlWithoutHttps == null) return null;
+            if (urlWithoutHttps.ToLower().StartsWith(StrWww))
+                urlWithoutHttps = urlWithoutHttps.Remove(0, 4);
+            return urlWithoutHttps;
+        }
+
+
+        public static bool UrlIsLocalFile(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return false;
+            return url.ToLower().StartsWith("file:///");
+        }
+        public static bool UrlIsWebSite(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return false;
+            if (UrlIsIpAddress(url)) return true;
+            url = GetDomainNameFromUrl(url);
+            if (UrlIsIpAddress(url)) return true;
+            return IsValidDomainName(url);
+        }
+
+        static bool IsValidDomainName(string url)
+        {
+            if (string.IsNullOrEmpty(url)) return false;
+            url = url.ToLowerInvariant();
+            return !Regex.IsMatch(url, @"[^\x20-\x7E]+")
+                   && (Regex.IsMatch(url, DomainMatcherRegEx, RegexOptions.CultureInvariant)
+                       || Regex.IsMatch(url, LocalhostMatcherRegex, RegexOptions.CultureInvariant))
+                   && Regex.IsMatch(url, @"[a-zA-Z]+")
+                ;
+        }
+
+
+        /// <summary>
+        /// Evaluates addresses that may have HTTP/HTTPS and port numbers, as well as /subaddresses
+        /// </summary>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        public static bool UrlIsIpAddress(string domain)
+        {
+            var httpsRemoved = domain.RemoveFromStart("http://").RemoveFromStart("https://");
+            var firstPartSplit = httpsRemoved.Split('/').First().Split(':');
+
+            try
+            {
+                if (firstPartSplit.Length == 2)
+                    if (!int.Parse(firstPartSplit.Last()).Between(1, 65534, true))
+                        return false;
+            }
+            // If either :Port cannot be converted to int or it is not between 1 and 65534, it's not a port address
+            catch { return false; }
+
+            return firstPartSplit.Length.Between(1, 2) && IsIpAddress(firstPartSplit.First());
+        }
+
+        /// <summary>
+        /// Only strict IP addresses may be evaluated as true, without HTTP or /, as you may find in URLs
+        /// </summary>
+        /// <param name="domain"></param>
+        /// <returns></returns>
+        public static bool IsIpAddress(string domain)
+        {
+            var splitUrl = domain?.Split('.').ToList();
+
+            // Not four octets
+            if (splitUrl?.Count != 4) return false;
+
+            try
+            {
+                // First octet may not equal 0
+                if (int.Parse(splitUrl[0]) == 0)
+                    return false;
+
+                // All octets need to be between 0 and 255
+                if (splitUrl.All(s => int.Parse(s.ToString()).Between(0, 255)))
+                    return true;
+            }
+            catch { return false; }
+
+            return false;
+        }
+
+        public const string IpMatcherRegex = @"(?<First>2[0-4]\d|25[0-5]|[01]?\d\d?)\.(?<Second>2[0-4]\d|25[0-5]|[01]?\d\d?)\.(?<Third>2[0-4]\d|25[0-5]|[01]?\d\d?)\.(?<Fourth>2[0-4]\d|25[0-5]|[01]?\d\d?)";
+        public const string DomainMatcherRegEx = @"(?<=\n|^|\w\.|\/)[\w\-]+\.[a-zA-Z\-]{2,}(?=\n|\/|$|\r|\:\d*)";
+        public const string LocalhostMatcherRegex = @"localhost(?=\:\d*)";
+    }
+
     public static class StringExtensions
     {
+        public static string RemoveFromStart(this string removeFrom, string text2Remove) => removeFrom.StartsWith(text2Remove) ? removeFrom.Substring(text2Remove.Length, removeFrom.Length - text2Remove.Length) : removeFrom;
+
         public static string RemoveHtmlTags(this string toReplaceIn)
         {
             return Regex.Replace(toReplaceIn, "<[^>]*>", "");
