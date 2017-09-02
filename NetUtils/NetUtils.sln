@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetUtils", "NetUtils\NetUtils.csproj", "{B8EF4B2A-C4B7-4E28-85FE-7C2E6957EEAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8EF4B2A-C4B7-4E28-85FE-7C2E6957EEAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8EF4B2A-C4B7-4E28-85FE-7C2E6957EEAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8EF4B2A-C4B7-4E28-85FE-7C2E6957EEAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8EF4B2A-C4B7-4E28-85FE-7C2E6957EEAA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {124AD91F-591F-4F1C-A928-9C7AB2D84094}
+	EndGlobalSection
+EndGlobal
