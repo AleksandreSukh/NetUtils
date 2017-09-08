@@ -39,6 +39,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExeLocationInfo.cs" />
+    <Compile Include="FileVersionInfoProvider.cs" />
+    <Compile Include="FileVersionInfoWrapper.cs" />
+    <Compile Include="IExeLocationInfo.cs" />
     <Compile Include="MutexHelpers.cs" />
     <Compile Include="PathHelper.cs" />
     <Compile Include="ShaHasher.cs" />
