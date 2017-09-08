@@ -4,6 +4,22 @@ using TextLoggerNet.Loggers;
 
 namespace NetUtils
 {
+    public interface IFileVersionInfoProviderEx : IFileVersionInfoProvider
+    {
+        IFileVersionInfoWrapper GetVersionInfo(string path);
+    }
+    public class FileVersionInfoProviderEx : FileVersionInfoProvider, IFileVersionInfoProviderEx
+    {
+        IFileVersionInfoWrapper FromVersion(Version info)
+        {
+            return new FileVersionInfoWrapper(
+                info.Major,
+                info.Minor,
+                info.Build,
+                info.Revision,
+                $"{info.Major}.{info.Minor}.{info.Build}.{info.Revision}");
+        }
+    }
     public interface IFileVersionInfoWrapper
     {
         int FileMajorPart { get; set; }
